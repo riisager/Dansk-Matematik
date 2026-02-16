@@ -68,18 +68,19 @@ const storySchema: Schema = {
 export const generateStory = async (topic: string): Promise<StoryData> => {
   try {
     const prompt = `
-      Skriv en spændende historie på dansk til en 15-årig pige.
-      Historien skal være mellem 500 og 700 ord for at sikre tid til fordybelse og en ordentlig afslutning.
+      Skriv en medrivende, unik og dybdegående novelle på dansk til en 15-årig pige.
+      Længde: 500-700 ord.
       
-      Emne/Genre: ${topic || "En overraskende rejse eller et mysterium"}.
-      
-      Krav:
-      1. Brug fiktive personer, men inkluder mindst én interessant faktuel ting fra den virkelige verden (historie, videnskab, geografi osv.).
-      2. Sproget skal være engagerende, varieret og passe til en teenager. Undgå klichéer. Vær kreativ og uforudsigelig.
-      3. Historien skal have en tydelig start, midte og slutning.
-      4. Historien skal lede op til et matematisk problem, som læseren skal løse til sidst.
-      5. Det matematiske problem skal være på 9. klasses niveau (f.eks. procent, geometri, ligninger, sandsynlighed) og være integreret i handlingen.
-      6. Inkluder også et læseforståelsesspørgsmål (multiple choice), der tester om læseren har lagt mærke til en specifik detalje i teksten (ikke matematik, men handling/beskrivelse).
+      Historien skal bygges op omkring følgende input-elementer (hvis angivet):
+      ${topic || "Emne: En overraskende rejse eller et mysterium"}
+
+      Forfatter-instrukser:
+      1. **Karakterudvikling**: Start med at etablere 'Hovedpersonens' personlighed og situation tydeligt. Gennem historien skal hun konfronteres med 'Dilemmaet', som tvinger hende til at træffe et svært valg og vokse som menneske.
+      2. **Atmosfære og Plot**: Brug 'Stedet' og 'Stemningen' til at male et levende billede. Den 'Vigtige Genstand' skal spille en central, fysisk rolle i plottet - det er ikke bare pynt.
+      3. **Twist**: Det angivne 'Twist' må ikke afsløres for tidligt. Det skal komme som en overraskelse mod slutningen og ændre læserens forståelse af situationen.
+      4. **Virkelighed**: Flet mindst én fascinerende virkeligheds-fakta naturligt ind i handlingen (historisk, videnskabelig, geografisk, etc.).
+      5. **Matematik**: Historien skal kulminere i en højspændt situation, hvor hovedpersonen MÅ bruge matematik for at løse problemet eller komme videre. Niveauet skal være 9. klasse.
+      6. **Sprog**: Brug et sprog der tager læseren seriøst. Sanseligt, "show don't tell", og uden klichéer.
       
       Returner svaret som JSON.
     `;
@@ -90,7 +91,7 @@ export const generateStory = async (topic: string): Promise<StoryData> => {
       config: {
         responseMimeType: "application/json",
         responseSchema: storySchema,
-        temperature: 0.9, // Higher creativity for variation
+        temperature: 1.0, // High creativity for varied and unique stories
       },
     });
 

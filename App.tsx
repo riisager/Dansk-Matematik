@@ -17,6 +17,8 @@ const App: React.FC = () => {
   
   // Accessibility State
   const [fontSize, setFontSize] = useState(1.1); // rem
+  const [lineHeight, setLineHeight] = useState(1.6);
+  const [colorTheme, setColorTheme] = useState<'light' | 'sepia' | 'dark' | 'contrast'>('light');
   const [splitSentences, setSplitSentences] = useState(false);
   const [readingRuler, setReadingRuler] = useState(false);
   const [rulerY, setRulerY] = useState(0);
@@ -86,7 +88,7 @@ const App: React.FC = () => {
   };
 
   const handleSurpriseMe = () => {
-    // 6-dimensional generator for >2 million combinations
+    // 7-dimensional generator for deep, unique stories
     const roller = [
       "En der altid passer sig selv", "Klassens klovn", "En outsider med en hemmelighed", 
       "En person i dyb sorg", "En der er vant til at få sin vilje", "En aktivist", 
@@ -111,6 +113,13 @@ const App: React.FC = () => {
       "på en Discord-server", "til en begravelse", "i en kø på McDonald's", 
       "under en teltlejr i regnvejr", "på et mørkt skolebibliotek", "i en lufthavnsterminal"
     ]; 
+
+    const genstande = [
+      "et gammelt polaroidkamera", "en krypteret harddisk", "en halv amulet", 
+      "et brev dateret 50 år frem i tiden", "en nøgle der lyser i mørke", "en vinderkupon", 
+      "en stjålet sagsmappe", "en drone med lavt batteri", "en dagbog med blanke sider", 
+      "et simkort tapet fast under en bænk", "en medaljon med et ukendt ansigt", "en spraydåse der aldrig løber tør"
+    ];
   
     const twists = [
       "hvor mobilen er gået død", "mens alle ser på", "hvor sandheden koster alt", 
@@ -129,11 +138,20 @@ const App: React.FC = () => {
     const rStemning = stemninger[Math.floor(Math.random() * stemninger.length)];
     const rTema = temaer[Math.floor(Math.random() * temaer.length)];
     const rSted = steder[Math.floor(Math.random() * steder.length)];
+    const rGenstand = genstande[Math.floor(Math.random() * genstande.length)];
     const rTwist = twists[Math.floor(Math.random() * twists.length)];
     const rDilemma = dilemmaer[Math.floor(Math.random() * dilemmaer.length)];
     
-    // Construct a complex prompt based on all dimensions
-    const randomTopic = `Hovedperson: ${rRolle}. Stemning: ${rStemning}. Sted: ${rSted}. Tema: ${rTema}. Twist: ${rTwist}. Dilemma: ${rDilemma}.`;
+    // Construct a rich, structural prompt
+    const randomTopic = `
+      Hovedperson: ${rRolle}. 
+      Stemning: ${rStemning}. 
+      Sted: ${rSted}. 
+      Tema: ${rTema}. 
+      Vigtig Genstand: ${rGenstand}.
+      Twist: ${rTwist}. 
+      Dilemma: ${rDilemma}.
+    `.trim().replace(/\s+/g, ' ');
     
     setTopic(randomTopic);
     
@@ -187,12 +205,26 @@ const App: React.FC = () => {
     }
   };
 
+  // Helper to get theme classes
+  const getThemeClasses = () => {
+    switch (colorTheme) {
+      case 'sepia': return 'bg-[#f4ecd8] text-[#5b4636] border-[#e3d7bf]';
+      case 'dark': return 'bg-[#1f2937] text-[#e5e7eb] border-[#374151]';
+      case 'contrast': return 'bg-yellow-300 text-black border-black';
+      default: return 'bg-white text-gray-700 border-gray-100';
+    }
+  };
+
   // Logic to process text based on accessibility settings
   const renderStoryText = (text: string) => {
+    // Adjust colors for dark/contrast modes in the splitter elements
+    const splitBorderColor = colorTheme === 'dark' ? 'border-gray-600' : (colorTheme === 'contrast' ? 'border-black' : 'border-indigo-100');
+    const splitHoverColor = colorTheme === 'dark' ? 'hover:bg-gray-800' : (colorTheme === 'contrast' ? 'hover:bg-yellow-400' : 'hover:bg-indigo-50/50');
+
     if (!splitSentences) {
       // Standard paragraph rendering
       return text.split('\n').map((paragraph, idx) => (
-        <p key={idx} className="mb-4" style={{ fontSize: `${fontSize}rem`, lineHeight: '1.6' }}>
+        <p key={idx} className="mb-4" style={{ fontSize: `${fontSize}rem`, lineHeight: lineHeight }}>
           {paragraph}
         </p>
       ));
@@ -205,8 +237,8 @@ const App: React.FC = () => {
           {sentences.map((sentence, idx) => (
             <div 
               key={idx} 
-              className="pl-4 border-l-4 border-indigo-100 py-1 hover:bg-indigo-50/50 transition-colors rounded-r"
-              style={{ fontSize: `${fontSize}rem`, lineHeight: '1.5' }}
+              className={`pl-4 border-l-4 py-1 transition-colors rounded-r ${splitBorderColor} ${splitHoverColor}`}
+              style={{ fontSize: `${fontSize}rem`, lineHeight: lineHeight }}
             >
               {sentence.trim()}
             </div>
@@ -340,34 +372,38 @@ const App: React.FC = () => {
             <AccessibilityControls 
               fontSize={fontSize}
               setFontSize={setFontSize}
+              lineHeight={lineHeight}
+              setLineHeight={setLineHeight}
+              colorTheme={colorTheme}
+              setColorTheme={setColorTheme}
               splitSentences={splitSentences}
               setSplitSentences={setSplitSentences}
               readingRuler={readingRuler}
               setReadingRuler={setReadingRuler}
             />
 
-            <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 mb-8">
-              {/* Decorative Banner */}
+            <div className={`rounded-3xl shadow-xl overflow-hidden border mb-8 transition-colors duration-300 ${getThemeClasses()}`}>
+              {/* Decorative Banner (Only visible in light/sepia modes mostly, but kept for structure) */}
               <div className="h-3 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
               
               <div className="p-8 md:p-10">
                 
                 {/* Title */}
-                <h2 className="text-3xl font-serif font-bold text-gray-900 mb-6 leading-tight">
+                <h2 className={`text-3xl font-serif font-bold mb-6 leading-tight ${colorTheme === 'contrast' ? 'text-black' : (colorTheme === 'dark' ? 'text-white' : 'text-gray-900')}`}>
                   {data.title}
                 </h2>
 
                 {/* Story Text */}
-                <div className="prose prose-lg text-gray-700 font-serif leading-relaxed mb-8 max-w-none">
+                <div className={`prose prose-lg font-serif leading-relaxed mb-8 max-w-none ${colorTheme === 'dark' ? 'text-gray-200' : (colorTheme === 'contrast' ? 'text-black' : 'text-gray-700')}`}>
                   {renderStoryText(data.story_text)}
                 </div>
 
                 {/* Fact Box */}
-                <div className="bg-amber-50 border-l-4 border-amber-400 p-5 rounded-r-lg mb-8">
-                  <h4 className="text-amber-800 font-bold text-sm uppercase tracking-wide mb-1">
+                <div className={`border-l-4 p-5 rounded-r-lg mb-8 ${colorTheme === 'dark' ? 'bg-gray-800 border-amber-500' : (colorTheme === 'contrast' ? 'bg-white border-black' : 'bg-amber-50 border-amber-400')}`}>
+                  <h4 className={`font-bold text-sm uppercase tracking-wide mb-1 ${colorTheme === 'dark' ? 'text-amber-400' : (colorTheme === 'contrast' ? 'text-black' : 'text-amber-800')}`}>
                     Virkelighedens Verden
                   </h4>
-                  <p className="text-amber-900 text-sm leading-relaxed" style={{ fontSize: `${Math.max(0.875, fontSize - 0.15)}rem` }}>
+                  <p className={`text-sm leading-relaxed ${colorTheme === 'dark' ? 'text-gray-300' : (colorTheme === 'contrast' ? 'text-black' : 'text-amber-900')}`} style={{ fontSize: `${Math.max(0.875, fontSize - 0.15)}rem` }}>
                     {data.real_world_fact}
                   </p>
                 </div>
